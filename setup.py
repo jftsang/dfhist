@@ -1,8 +1,11 @@
 from setuptools import setup
 
+with open("README.md") as f:
+    README = f.read()
+
 setup(
     name="dfhist",
-    version="0.0.0",
+    version="0.0.0.post1",
     packages=["dfhist"],
     url="https://github.com/jftsang/dfhist",
     license="CC BY 4.0",
@@ -12,4 +15,5 @@ setup(
     setup_requires=[
         "pandas",
     ],
+    long_description=README,
 )
