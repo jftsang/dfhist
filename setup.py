@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setup(
     name="dfhist",
-    version="0.0.0.post1",
+    version="0.0.0.post2",
     packages=["dfhist"],
     url="https://github.com/jftsang/dfhist",
     license="CC BY 4.0",
@@ -15,5 +15,6 @@ setup(
     setup_requires=[
         "pandas",
     ],
+    long_description_content_type='text/markdown',
     long_description=README,
 )
