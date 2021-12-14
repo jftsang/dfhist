@@ -12,7 +12,7 @@ setup(
     author="J. M. F. Tsang",
     author_email="j.m.f.tsang@cantab.net",
     description="utilities for caching pandas dataframes",
-    setup_requires=[
+    install_requires=[
         "pandas",
     ],
     long_description_content_type='text/markdown',
