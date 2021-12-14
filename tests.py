@@ -39,6 +39,14 @@ class TestDfhistInitialisation(unittest.TestCase):
             with self.assertRaises(ValueError):
                 DFHist(directory=td, format='improper.csv')
 
+    def test_dfhist_creates_missing_directory(self):
+        with tempfile.TemporaryDirectory() as td:
+            cachedir = os.path.join(td, 'subdir')
+            DFHist(
+                directory=cachedir, format='{timestamp}.csv'
+            )
+            self.assertTrue(os.path.isdir(cachedir))
+
 
 class TestDfhist(unittest.TestCase):
     def setUp(self):

@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from functools import wraps
 from glob import glob
+from os import makedirs
 from os.path import getctime, join
 from typing import Optional, Callable, List, Any
 
@@ -60,6 +61,7 @@ class DFHist:
                                  function (e.g. pd.read_csv).
         """
         self.directory = directory
+        makedirs(self.directory, exist_ok=True)
 
         if expire is not None and expire < 0:
             raise ValueError("expire must be nonnegative")
