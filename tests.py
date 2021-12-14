@@ -2,11 +2,10 @@ import os
 import unittest
 import tempfile
 import time
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 import pandas as pd
 
-import dfhist
 from dfhist import DFHist
 
 
@@ -20,6 +19,27 @@ TEST_DF = pd.DataFrame(
 )
 
 
+# noinspection PyArgumentList
+class TestDfhistInitialisation(unittest.TestCase):
+    def test_dfhist_rejects_no_args(self):
+        with self.assertRaises(TypeError):
+            DFHist()
+
+    def test_dfhist_rejects_no_directory(self):
+        with self.assertRaises(TypeError):
+            DFHist(format='{timezone}.csv')
+
+    def test_dfhist_rejects_no_format(self):
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaises(TypeError):
+                DFHist(directory=td)
+
+    def test_dfhist_rejects_improper_format(self):
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaises(ValueError):
+                DFHist(directory=td, format='improper.csv')
+
+
 class TestDfhist(unittest.TestCase):
     def setUp(self):
         self.td = tempfile.TemporaryDirectory()
@@ -29,6 +49,7 @@ class TestDfhist(unittest.TestCase):
 
         self.dfhist = DFHist(
             directory=self.td.name,
+            format='{timestamp}.csv',
             expire=None,
             tsformatter=self.counter,
             method="csv",

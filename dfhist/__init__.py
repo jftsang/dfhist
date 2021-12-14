@@ -1,7 +1,6 @@
 from datetime import datetime as dt
 from functools import wraps
 from glob import glob
-from os import getcwd
 from os.path import getctime, join
 from typing import Optional, Callable, List, Any
 
@@ -9,22 +8,66 @@ import pandas as pd
 
 
 class DFHist:
+    """Decorator class for decorating pandas dataframe-valued functions.
+    Functions that are thus decorated with create serialisations (e.g.
+    csv dumps) of their results in a cache directory.
+
+    Example:
+
+        @DFHist(
+            directory='/tmp/cache',
+            format='query_{timestamp.csv}',
+            expire=3600,
+        )
+        def f() -> pd.DataFrame:
+            with sqlite3('database.db').connect() as conn:
+                return pd.read_sql_query(
+                    'SELECT * FROM really_big_table', conn
+                )
+
+        Note that the value of the `format` keyword argument is not a
+        fstring.
+
+        A call to f() would create a file in /tmp/cache/
+    """
     def __init__(
         self,
         *,
-        directory: str = None,
+        directory: str,
+        format: str,
         expire: Optional[int] = None,
-        format: str = "{timestamp}.csv",
         tsformatter: Optional[Callable[[], str]] = None,
         method="csv",
         marshal_params=None,
         unmarshal_params=None,
     ):
-        self.directory = directory if directory is not None else getcwd()
+        """Create an instance of DFHist. In practice this should be used
+        as a function decorator.
+
+        :param directory: The directory in which to store cache files.
+        :param format: The format of the cache files' names. Should
+                       contain the substring '{timestamp}' somewhere.
+                       Not a fstring.
+        :param expire: The lifetime of a cached value, in seconds. Set
+                       this to None for no expiry.
+        :param tsformatter: A function that produces a string for
+                            producing the timestamp.
+        :param method: What sort of serialisation to use (only 'csv' is
+                       available at the moment).
+        :param marshal_params: A dict of kwargs for the marshalling
+                               function (e.g. df.to_csv).
+        :param unmarshal_params: A dict of kwargs for the unmarshalling
+                                 function (e.g. pd.read_csv).
+        """
+        self.directory = directory
+
         if expire is not None and expire < 0:
             raise ValueError("expire must be nonnegative")
 
         self.expiry = expire
+        if '{timestamp}' not in format:
+            raise ValueError('format must have "{timestamp}" in it somewhere')
+
         self.format = format
         if tsformatter is not None:
             self.tsformatter = tsformatter
